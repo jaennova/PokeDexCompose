@@ -1,80 +1,62 @@
 # PokeDexCompose
 
-PokeDexCompose es una aplicación de Android que utiliza la PokeAPI para mostrar información sobre Pokémon. Este proyecto sirve como ejemplo de cómo consumir una API REST usando Retrofit y la arquitectura MVVM en Android con Jetpack Compose.
+## Rama: feature/data-and-network
 
-## Rama: setup-initial-project
+Esta rama implementa los modelos de datos y la configuración de red para PokeDexCompose.
 
-Esta rama contiene la configuración inicial del proyecto PokeDexCompose.
+### Modelos de Datos
 
-### Configuración del proyecto
+Se han creado las siguientes clases de modelo en `com.jaennova.pokedexcompose.data.model`:
 
-1. Se creó un nuevo proyecto en Android Studio usando la plantilla "Empty Compose Activity".
-2. Se configuró el archivo `build.gradle.kts` con las dependencias necesarias.
+- `Pokemon`: Representa la información detallada de un Pokémon.
+- `Sprites`: Contiene las URLs de las imágenes del Pokémon.
+- `PokemonList`: Representa la lista de Pokémon obtenida de la API.
+- `PokemonListItem`: Representa un elemento individual en la lista de Pokémon.
 
-### Dependencias principales
+### Configuración de Red
 
-- Retrofit para las llamadas a la API
-- Coil para la carga de imágenes
-- ViewModel de Jetpack para la arquitectura MVVM
+1. **API Service**
 
-### Estructura del proyecto
+   Se ha creado la interfaz `PokeApiService` en `com.jaennova.pokedexcompose.data.api`:
 
-Se crearon los siguientes paquetes principales:
+   ```kotlin
+   interface PokeApiService {
+       @GET("pokemon")
+       suspend fun getPokemonList(): PokemonList
 
-- `com.jaennova.pokedexcompose.data.api`
-- `com.jaennova.pokedexcompose.data.model`
-- `com.jaennova.pokedexcompose.ui.viewmodel`
-- `com.jaennova.pokedexcompose.ui.screen`
+       @GET("pokemon/{name}")
+       suspend fun getPokemonDetails(@Path("name") name: String): Pokemon
+   }
 
-### Configuración de AndroidManifest.xml
+2. **Retrofit Client**
 
-Se añadió el permiso de internet al archivo `AndroidManifest.xml`:
-
-```xml
-<uses-permission android:name="android.permission.INTERNET" />
-```
-
-### Configuración de libs.versions.toml
-
-Se creó el archivo `libs.versions.toml` en la raíz del proyecto con las versiones de las dependencias:
-
-```toml
-[versions]
-retrofit = "2.9.0"
-coilCompose = "2.4.0"
-converterGson = "2.9.0"
-lifecycleRuntimeKtx = "2.8.4"
-navigationCompose = "2.7.7"
-
-[libraries]
-androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleRuntimeKtx" }
-coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
-converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
-androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
-retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
-kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroid" }
-```
-
-### Configuración de build.gradle.kts
-
-Se añadieron las siguientes dependencias al archivo `app/build.gradle.kts`:
+   Se ha creado la clase `PokeApi` en `com.jaennova.pokedexcompose.data.api` para configurar
+   Retrofit:
 
 ```kotlin
-dependencies {
 
-    // ViewModel
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
+object RetrofitClient {
+private const val BASE_URL = "https://pokeapi.co/api/v2/"
 
-    // Retrofit
-    implementation(libs.retrofit)
-    implementation(libs.converter.gson)
+    val instance: PokeApiService by lazy {
+        val retrofit = Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
 
-    // Coil
-    implementation(libs.coil.compose)
+        retrofit.create(PokeApiService::class.java)
+    }
 
-    // Coroutines
-    implementation(libs.kotlinx.coroutines.android)
-
-    // Otras dependencias...
 }
 ```
+## Cambios Realizados
+
+Creación de modelos de datos en data.model.
+Implementación de la interfaz PokeApiService para definir los endpoints de la API.
+Configuración de Retrofit para realizar llamadas a la API.
+
+## Próximos Pasos
+
+Implementar el ViewModel para manejar la lógica de negocio.
+Crear la UI básica con Jetpack Compose.
+Mostrar la lista de Pokémon en la UI
