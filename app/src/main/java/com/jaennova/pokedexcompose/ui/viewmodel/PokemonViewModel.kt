@@ -1,14 +1,16 @@
-# PokeDexCompose
+package com.jaennova.pokedexcompose.ui.viewmodel
 
-## Rama: feature/viewmodel-and-ui
 
-Esta rama implementa el ViewModel para manejar la lógica de negocio y crea la UI básica con Jetpack Compose para PokeDexCompose.
+import android.util.Log
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.jaennova.pokedexcompose.data.api.RetrofitClient
+import com.jaennova.pokedexcompose.data.model.Pokemon
+import com.jaennova.pokedexcompose.data.model.PokemonListItem
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
-### ViewModel
-
-Se ha creado `PokemonViewModel` en `com.jaennova.pokedexcompose.ui.viewmodel`:
-
-```kotlin
 class PokemonViewModel : ViewModel() {
     private val _pokemonList = MutableStateFlow<List<PokemonListItem>>(emptyList())
     val pokemonList: StateFlow<List<PokemonListItem>> = _pokemonList
@@ -44,34 +46,3 @@ class PokemonViewModel : ViewModel() {
         }
     }
 }
-```
-### UI Básica
-
-Se ha creado `PokemonListScreen` en `com.jaennova.pokedexcompose.ui.screens`:
-
-```kotlin
-@Composable
-fun PokemonApp(viewModel: PokemonViewModel = viewModel()) {
-    val pokemonList by viewModel.pokemonList.collectAsState()
-
-    LazyColumn {
-        items(pokemonList) { pokemon ->
-            Text(text = pokemon.name, modifier = Modifier.padding(16.dp))
-        }
-    }
-}
-```
-
-### Cambios Realizados
-
-1. Implementación del `PokemonViewModel` para manejar la lógica de negocio.
-2. Creación de una UI básica con Jetpack Compose que muestra una lista de nombres de Pokémon.
-3. Integración del ViewModel con la UI para mostrar datos dinámicos.
-
-### Próximos Pasos
-
-1. Mejorar la UI de la lista de Pokémon.
-2. Implementar la pantalla de detalles del Pokémon.
-3. Agregar navegación entre la lista y los detalles.
-4. Implementar la carga de imágenes con Coil.
-
