@@ -18,30 +18,43 @@ class PokemonViewModel : ViewModel() {
     private val _selectedPokemon = MutableStateFlow<Pokemon?>(null)
     val selectedPokemon: StateFlow<Pokemon?> = _selectedPokemon
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
+    private val _error = MutableStateFlow<String?>(null)
+    val error: StateFlow<String?> = _error
+
     init {
         fetchPokemonList()
     }
 
     private fun fetchPokemonList() {
         viewModelScope.launch {
+            _isLoading.value = true
+            _error.value = null
             try {
                 val response = RetrofitClient.instance.getPokemonList()
                 _pokemonList.value = response.results
-                Log.d("PokemonViewModel", "Fetched ${response.results.size} Pokemon")
             } catch (e: Exception) {
-                Log.e("PokemonViewModel", "Error fetching Pokemon list", e)
+                _error.value = "Error al cargar la lista de Pokémon"
+            } finally {
+                _isLoading.value = false
             }
         }
     }
 
     fun fetchPokemonDetails(name: String) {
         viewModelScope.launch {
+            _isLoading.value = true
+            _error.value = null
+            _selectedPokemon.value = null
             try {
                 val pokemon = RetrofitClient.instance.getPokemonDetails(name)
                 _selectedPokemon.value = pokemon
-                Log.d("PokemonViewModel", "Fetched details for Pokemon: ${pokemon.name}")
             } catch (e: Exception) {
-                Log.e("PokemonViewModel", "Error fetching Pokemon details", e)
+                _error.value = "Error al cargar los detalles del Pokémon"
+            } finally {
+                _isLoading.value = false
             }
         }
     }
